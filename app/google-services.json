@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1027299359570",
+    "firebase_url": "https://maccproject-c15b4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "maccproject-c15b4",
+    "storage_bucket": "maccproject-c15b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027299359570:android:0ae0cc7a1339fad244188b",
+        "android_client_info": {
+          "package_name": "com.example.findmyfriends"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDed0H9BsQp7BHqKA0EYK9kq-Bn_DOPKi4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
