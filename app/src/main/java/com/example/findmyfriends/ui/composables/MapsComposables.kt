@@ -3,6 +3,7 @@ package com.example.findmyfriends.ui.composables
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -54,7 +55,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.compose.*
-import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -237,6 +237,7 @@ fun OverlayGraphics(clusterManager:  ClusterManager<DataUser>?, cameraLatLng: La
     if (clusterManager?.markerCollection?.markers!! != null) {
 
         for (marker in clusterManager?.markerCollection?.markers!!) {
+            Log.i("MARKERS",marker.toString())
             if (!checkLatLngWithinBounds(
                     marker.position.latitude,
                     marker.position.longitude,
@@ -245,47 +246,75 @@ fun OverlayGraphics(clusterManager:  ClusterManager<DataUser>?, cameraLatLng: La
                 )){
                 val mapHorizontalDensity = (dpWidth) / (boundsNE.longitude-boundsSW.longitude)
                 val mapVerticalDensity = (dpHeight-50) / (boundsNE.latitude-boundsSW.latitude)
-
-                val arrowLng: Double
-                val offsetX: Dp
+                var offsetX: Dp
+                var horizontalAngle = 0
                 if (marker.position.longitude>= boundsNE.longitude){
-                    arrowLng = boundsNE.longitude - (100F/mapHorizontalDensity)
                     offsetX = maxOffsetX.dp
+                    horizontalAngle = 1
                 } else if (marker.position.longitude<= boundsSW.longitude){
-                    arrowLng = boundsSW.longitude + (100F/mapHorizontalDensity)
                     offsetX = 0.dp
+                    horizontalAngle = -1
+
                 } else {
-                    arrowLng = marker.position.longitude //+50F/mapDensity
-                    val tempOffsetX = ((marker.position.longitude - boundsSW.longitude) * mapHorizontalDensity )-50F
-                    offsetX = if (tempOffsetX>=maxOffsetX) {maxOffsetX.dp}
-                    else if (tempOffsetX<0) {0.dp}
-                    else {tempOffsetX.dp}
+                    offsetX = (maxOffsetX / 2).dp
+
                 }
-                val arrowLat: Double
-                val offsetY: Dp
+                var offsetY: Dp
+                var verticalAngle = 0
                 if (marker.position.latitude>= boundsNE.latitude){
-                    arrowLat = boundsNE.latitude - (100F/mapVerticalDensity)
                     offsetY = 0.dp
+                    verticalAngle = 1
                 } else if (marker.position.latitude<= boundsSW.latitude){
-                    arrowLat = boundsSW.latitude + (100F/mapVerticalDensity)
                     offsetY = maxOffsetY.dp
+                    verticalAngle = -1
                 } else {
-                    arrowLat = marker.position.latitude //+ (100F/mapDensity)
-                    val tempOffsetY = ((boundsNE.latitude - marker.position.latitude) * mapVerticalDensity )-100F
-                    offsetY = if (tempOffsetY>=maxOffsetY) {maxOffsetY.dp}
-                    else if (tempOffsetY<0) {0.dp}
-                    else {tempOffsetY.dp}
+                    offsetY = (maxOffsetY / 2).dp
                 }
                 var rotation: Float by remember  { mutableFloatStateOf(0f)
                 }
-                var deltaLNG = marker.position.longitude - arrowLng
-                val deltaY = sin(deltaLNG) * cos(marker.position.latitude)
-                val deltaX = cos(arrowLat) * sin(marker.position.latitude) - sin(
-                    arrowLat
-                ) * cos(marker.position.latitude) * cos(deltaLNG)
-                var angle = (atan2(deltaY, deltaX)* 180 / Math.PI )
-
-                angle = (angle + 360) % 360 // Ensure angle is within 0 to 360 degrees
+                var angle = 0
+                if (verticalAngle == 1){
+                    if (horizontalAngle == 1){ //Marker is north east of user
+                        angle = 45
+                    }
+                    else if (horizontalAngle == -1) { //Marker is north west of user
+                        angle = -45
+                    }
+                    else { //Marker is north  of user
+                        angle = 0
+                        offsetX = (((marker.position.longitude - boundsSW.longitude) * mapHorizontalDensity )-50F).dp
+//                        offsetY = if (tempOffsetY>=maxOffsetY) {maxOffsetY.dp}
+//                        else if (tempOffsetY<0) {0.dp}
+//                        else {tempOffsetY.dp}
+                    }
+                }
+                else if (verticalAngle == -1){
+                    if (horizontalAngle == 1){//Marker is south east of user
+                        angle = 180-45
+                    }
+                    else if (horizontalAngle == -1) { //Marker is south west of user
+                        angle = 180+45
+                    }
+                    else {          //Marker is south of user
+                        angle = 180
+                        offsetX = (((marker.position.longitude - boundsSW.longitude) * mapHorizontalDensity )-50F).dp
+                    }
+                }
+                else{
+                    offsetY = (((boundsNE.latitude - marker.position.latitude) * mapVerticalDensity )-150F).dp
+//                    offsetX = if (tempOffsetX>=maxOffsetX) {maxOffsetX.dp}
+//                    else if (tempOffsetX<0) {0.dp}
+//                    else {tempOffsetX.dp}
+                    if (horizontalAngle == 1){ //Marker is  east of user
+                        angle = 90
+                    }
+                    else if (horizontalAngle == -1) { //Marker is west of user
+                        angle = 270
+                    }
+                    else {          //Marker is within screen bounds and arrow won't show
+                        angle = 180
+                    }
+                }
                 rotation = angle.toFloat()
                 Image(
                     painter = painterResource(id = R.drawable.arrow_upward),

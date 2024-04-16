@@ -47,7 +47,7 @@ class LocationViewModel : ViewModel() {
     private val serverApi = ApiRetrofitHelper.getInstance().create(LocationApi::class.java)
     private val _location: MutableLiveData<Location> = MutableLiveData<Location>()
     val location: LiveData<Location> = _location
-    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,5000).build() //5000 = updates every 5 seconds
+    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,3000).build() //3000 = updates every 3 seconds
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var localizationOn = false
     private val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)

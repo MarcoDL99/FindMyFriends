@@ -49,6 +49,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -189,12 +190,18 @@ fun MainScreen(navController: NavController, fbvm: FirebaseDataViewModel, lvm: L
                 },
                 actions = {
                     IconButton(onClick = {
-                        val intent = Intent(context, CameraActivity::class.java)
-                        context.startActivity(intent)
+                        navController.navigate("main_screen")
+                        {
+                            popUpTo("main_screen") { inclusive = true }
+                        }
+//                        val intent = Intent(context, CameraActivity::class.java)
+//                        context.startActivity(intent)
                     }) {
                         Icon(
-                            imageVector = Icons.Filled.CameraAlt,
-                            contentDescription = "Use Camera",
+//                            imageVector = Icons.Filled.CameraAlt,
+//                            contentDescription = "Use Camera",
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "Refresh",
                             modifier = Modifier.scale(0.85f)
                         )
                     }
@@ -265,6 +272,10 @@ fun MainScreen(navController: NavController, fbvm: FirebaseDataViewModel, lvm: L
                                 "Confirm"
                             ) { _, _ ->
                                 fbvm.joinGroup(joinedGroupID.text.toString())
+                                navController.navigate("main_screen")
+                                {
+                                    popUpTo("main_screen") { inclusive = true }
+                                }
                             }
                             builder.setNegativeButton(
                                 R.string.cancel
@@ -629,7 +640,7 @@ fun GroupDetailPage(navController: NavController, fmfGroupId: String, fbvm: Fire
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)){
-            val qrCodeBitMap = generateQRCode(fmfGroupId)
+                val qrCodeBitMap = generateQRCode(fmfGroupId)
                 if (qrCodeBitMap != null){
                     Image(qrCodeBitMap!!.asImageBitmap(),
                         contentDescription =  fmfGroupId,
@@ -813,7 +824,6 @@ fun generateQRCode(data: String): Bitmap? {
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun CameraScreen(executor: Executor,
-
                  fbvm: FirebaseDataViewModel,
                  onError: (ImageCaptureException) -> Unit
 ){

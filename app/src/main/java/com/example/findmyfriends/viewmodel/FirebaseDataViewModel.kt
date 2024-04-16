@@ -140,15 +140,10 @@ class FirebaseDataViewModel: ViewModel() {
         }
     }
     fun joinGroup(groupID: String){
-        if (groups.value?.containsKey(groupID) == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 FirebaseServices.joinGroup(groupID)
                 loadGroups()
             }
-        }
-        else{
-            Log.d("GROUPALREADYJOINED","USER ALREADY IS PART OF THE GROUP")
-        }
 
     }
     fun leaveGroup(groupID: String){

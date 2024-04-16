@@ -184,7 +184,7 @@ object FirebaseServices {
                         }
                         launch {
                             try{
-                                db.collection("groups").document(groupID).update("groups",FieldValue.arrayUnion(groupID)).await()
+                                db.collection("groups").document(groupID).update("userIDs",FieldValue.arrayUnion(auth.currentUser!!.uid)).await()
                             }
                             catch (e: Exception){
                                 message += "ERROR: ${e.message!!.split(".")[0]}\n"
